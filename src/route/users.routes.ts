@@ -2,11 +2,10 @@ import { Router } from "express";
 
 const router = Router();
 
-import {getUsers, createUser} from "../controllers/users.controller";
+import {getUsers, createUser, deleteUser} from "../controllers/users.controller";
 
 router.route('/')
     .get(getUsers)
-    .post(createUser);
-    
-
+    .post(createUser)
+    router.delete('/delete_user', deleteUser);
 export default router;

@@ -32,7 +32,7 @@ export class App {
         this.app.use(indexRoutes);
         this.app.use('/users', UserRoute);
         this.app.use('/auth',AuthRoute);
-        this.app.use('/changePassword',changePasswordRoute);
+        this.app.use('/change_password',changePasswordRoute);
     }
      
     async listen(){

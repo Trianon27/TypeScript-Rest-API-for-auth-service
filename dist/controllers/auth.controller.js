@@ -12,29 +12,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.showProfile = exports.loginUser = exports.getUsers = void 0;
+exports.showProfile = exports.loginUser = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const database_1 = require("../database");
-function getUsers(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const conn = yield (0, database_1.connect)();
-        const users = yield conn.query('SELECT * FROM users');
-        return res.json(users[0]);
-    });
-}
-exports.getUsers = getUsers;
 //create a function to login
 function loginUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { email, user_password } = req.body;
+        const loginU = req.body;
         const conn = yield (0, database_1.connect)();
-        const users = yield conn.query('SELECT * FROM users  WHERE email = ?', [email]);
-        if (users[0].length > 0) {
-            if (bcrypt_1.default.compareSync(user_password, users[0][0].user_password)) {
+        if (loginU.user_name) {
+            console.log("user_name");
+            var login_users = yield conn.query('SELECT * FROM users  WHERE user_name = ?', [loginU.user_name]);
+        }
+        else if (loginU.email) {
+            console.log("email");
+            var login_users = yield conn.query('SELECT * FROM users  WHERE email = ?', [loginU.email]);
+        }
+        else {
+            return res.status(404).json({ message: 'incorrect data' });
+        }
+        if (login_users[0].length > 0) {
+            if (bcrypt_1.default.compareSync(loginU.user_password, login_users[0][0].user_password)) {
                 //token generator
-                const token = jsonwebtoken_1.default.sign({ id: users[0][0].id }, process.env.TOKEN_SECRET || 'my_secret_token', { expiresIn: '1h' });
-                return res.header('token', token).json(users[0]);
+                const token = jsonwebtoken_1.default.sign({ id: login_users[0][0].id }, process.env.TOKEN_SECRET || 'my_secret_token', { expiresIn: '1h' });
+                return res.header('token', token).json({ message: "login successful and token generated" });
             }
             else {
                 return res.status(404).json({ message: 'The passwords do not match' });

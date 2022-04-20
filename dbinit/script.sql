@@ -1,4 +1,5 @@
-CREATE DATABASE users_lalu;
+
+USE lalu_auth_db;
 
 CREATE TABLE users(
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -11,4 +12,3 @@ CREATE TABLE users(
     birth DATETIME NOT NULL
 );
 
-DESCRIBE users;

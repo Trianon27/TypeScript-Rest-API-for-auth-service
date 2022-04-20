@@ -3,14 +3,6 @@ import bcrypt from 'bcrypt'
 
 import {connect} from '../database'
 
-
-
-export async function getUsers(req: Request, res: Response): Promise<Response> {
-    const conn = await connect();
-    const users = await conn.query('SELECT * FROM users');
-    return res.json(users[0]);
-}
-
 //create a function to change password
 export async function changePassword(req: Request, res: Response): Promise<Response> {
     const {email, password, confirm_password} = req.body;   

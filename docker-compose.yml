@@ -1,0 +1,53 @@
+services:
+  mysqldb:
+    build: ./dbinit
+    container_name: lalu_auth_db_container
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    environment:
+      MYSQL_DATABASE: lalu_auth_db
+      MYSQL_USER: lalu_user
+      MYSQL_PASSWORD: lalu_password
+      MYSQL_ROOT_PASSWORD: lalu_password
+      SERVICE_TAGS: prod
+      SERVICE_NAME: mysqldb
+    volumes:
+      #- ./dbinit/init.sql:/docker-entrypoint-initdb.d/0_init.sql
+      - lalu_auth_vol:/var/lib/mysql
+      
+    networks:
+      - internalnet
+
+  lalu_auth_ms:
+    container_name: lalu_auth_ms_container
+    build: .
+    image: lalu_auth_ms
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    environment:
+      DB_HOST: mysqldb
+      DB_PORT: 3306
+      DB_USER: 'lalu_user'
+      DB_PASSWORD: 'lalu_password'
+      DB_DATABASE: lalu_auth_db
+      DB_LIMIT: 10
+      SERVICE_TAGS: prod
+      SERVICE_NAME: lalu_auth_ms
+      SERVER_PORT: 3000
+    depends_on:
+      - mysqldb
+    networks:
+      - internalnet
+
+networks:
+  internalnet:
+    driver: bridge
+  
+volumes:
+  lalu_auth_vol:

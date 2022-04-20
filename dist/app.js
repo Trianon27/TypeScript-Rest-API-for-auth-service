@@ -39,7 +39,7 @@ class App {
         this.app.use(index_routes_1.default);
         this.app.use('/users', users_routes_1.default);
         this.app.use('/auth', auth_routes_1.default);
-        this.app.use('/changePassword', changePassword_route_1.default);
+        this.app.use('/change_password', changePassword_route_1.default);
     }
     listen() {
         return __awaiter(this, void 0, void 0, function* () {

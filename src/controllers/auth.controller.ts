@@ -3,29 +3,34 @@ import bcrypt from 'bcrypt'
 import jwt from  'jsonwebtoken'
 
 import {connect} from '../database'
+import { login } from '../interface/login';
 
 
-
-export async function getUsers(req: Request, res: Response): Promise<Response> {
-    const conn = await connect();
-    const users = await conn.query('SELECT * FROM users');
-    return res.json(users[0]);
-}
 
 //create a function to login
 export async function loginUser(req: Request, res: Response): Promise<Response> {
-    const {email, user_password} = req.body;   
+    const loginU: login = req.body;   
     const conn = await connect();
-    const users: any = await conn.query('SELECT * FROM users  WHERE email = ?', [email]);
-    if(users[0].length > 0){
-        if(bcrypt.compareSync(user_password, users[0][0].user_password)){
+
+    if(loginU.user_name){
+        console.log("user_name");
+        var login_users: any = await conn.query('SELECT * FROM users  WHERE user_name = ?', [loginU.user_name]);
+    }else if(loginU.email){
+        console.log("email");
+        var login_users: any = await conn.query('SELECT * FROM users  WHERE email = ?', [loginU.email]);
+    }else{
+        return res.status(404).json({message: 'incorrect data'});
+    }
+    
+    if(login_users[0].length > 0){
+        if(bcrypt.compareSync(loginU.user_password, login_users[0][0].user_password)){
             
             //token generator
-            const token: string = jwt.sign({id: users[0][0].id}, process.env.TOKEN_SECRET || 'my_secret_token',
+            const token: string = jwt.sign({id: login_users[0][0].id}, process.env.TOKEN_SECRET || 'my_secret_token',
             {expiresIn: '1h'});
 
             
-            return res.header('token',token).json(users[0]);
+            return res.header('token',token).json({message: "login successful and token generated"});
             
         }else{
             return res.status(404).json({message: 'The passwords do not match'});
