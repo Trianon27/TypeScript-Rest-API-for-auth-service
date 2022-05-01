@@ -9,6 +9,7 @@ CREATE TABLE users(
     email VARCHAR(80) NOT NULL,
     user_password VARCHAR(80) NOT NULL,
     confirm_password VARCHAR(80) NOT NULL,
-    birth DATETIME NOT NULL
+    birth DATETIME NOT NULL,
+    first_in BOOLEAN DEFAULT true
 );
 
