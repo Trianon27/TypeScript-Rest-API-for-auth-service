@@ -23,8 +23,8 @@ export async function createUser(req: Request, res: Response): Promise<Response>
 
     if(newUser.user_password !== newUser.confirm_password) return res.status(404).json({message: 'The passwords are different'});
 
-    console.log(user_email_conf[0].length);
-    console.log(user_name_conf[0].length);
+    //console.log(user_email_conf[0].length);
+    //console.log(user_name_conf[0].length);
 
     if(user_email_conf[0].length == 0){
         if(user_name_conf[0].length == 0){
@@ -53,7 +53,7 @@ export async function createUser(req: Request, res: Response): Promise<Response>
 //delete user
 export async function deleteUser(req: Request, res: Response): Promise<Response> {
     const id = req.body;
-    console.log(id.id);
+    //console.log(id.id);
     const conn = await connect();
     const user_id_conf: any = await conn.query('SELECT id FROM users  WHERE id = ?', [id.id]);
 
