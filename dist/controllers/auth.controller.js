@@ -20,22 +20,26 @@ const database_1 = require("../database");
 function loginUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const loginU = req.body;
+        //console.log(loginU);
         const conn = yield (0, database_1.connect)();
         if (loginU.user_name) {
-            console.log("user_name");
+            //console.log("test0");
             var login_users = yield conn.query('SELECT * FROM users  WHERE user_name = ?', [loginU.user_name]);
         }
         else if (loginU.email) {
-            console.log("email");
             var login_users = yield conn.query('SELECT * FROM users  WHERE email = ?', [loginU.email]);
         }
         else {
             return res.status(404).json({ message: 'incorrect data' });
         }
+        //console.log("test1");
+        console.log(login_users[0].length);
         if (login_users[0].length > 0) {
+            //console.log("test2");
             if (bcrypt_1.default.compareSync(loginU.user_password, login_users[0][0].user_password)) {
                 //token generator
                 const token = jsonwebtoken_1.default.sign({ id: login_users[0][0].id }, process.env.TOKEN_SECRET || 'my_secret_token', { expiresIn: '1h' });
+                console.log(token);
                 return res.header('token', token).json({ message: "login successful and token generated" });
             }
             else {
@@ -55,8 +59,7 @@ function showProfile(req, res) {
         const users = yield conn.query('SELECT * FROM users  WHERE id = ?', [req.userId]);
         if (!users)
             return res.status(404).json({ message: 'User not found' });
-        console.log(req.userId);
-        console.log(users[0]);
+        //console.log("test11");
         return res.json(users[0][0]);
     });
 }

@@ -8,6 +8,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 function tokenValidation(req, res, next) {
     try {
         const token = req.header('token');
+        //console.log(token);
         if (!token)
             return res.status(404).json({ message: 'Access denied' });
         const payload = jsonwebtoken_1.default.verify(token, process.env['TOKEN_SECRET'] || 'my_secret_token');
@@ -15,6 +16,7 @@ function tokenValidation(req, res, next) {
         next();
     }
     catch (e) {
+        console.log("test2");
         res.status(400).send('Invalid Token');
     }
 }

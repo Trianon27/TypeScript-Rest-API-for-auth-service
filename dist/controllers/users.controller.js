@@ -34,8 +34,8 @@ function createUser(req, res) {
         const salt = yield bcrypt_1.default.genSalt(10);
         if (newUser.user_password !== newUser.confirm_password)
             return res.status(404).json({ message: 'The passwords are different' });
-        console.log(user_email_conf[0].length);
-        console.log(user_name_conf[0].length);
+        //console.log(user_email_conf[0].length);
+        //console.log(user_name_conf[0].length);
         if (user_email_conf[0].length == 0) {
             if (user_name_conf[0].length == 0) {
                 // Keeping the user and encryption of the password
@@ -64,7 +64,7 @@ exports.createUser = createUser;
 function deleteUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const id = req.body;
-        console.log(id.id);
+        //console.log(id.id);
         const conn = yield (0, database_1.connect)();
         const user_id_conf = yield conn.query('SELECT id FROM users  WHERE id = ?', [id.id]);
         if (user_id_conf[0].length > 0) {

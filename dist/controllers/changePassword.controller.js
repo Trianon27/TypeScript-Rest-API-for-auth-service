@@ -18,17 +18,17 @@ const database_1 = require("../database");
 //create a function to change password
 function changePassword(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { email, password, confirm_password } = req.body;
+        const { email, user_password, confirm_password } = req.body;
         const conn = yield (0, database_1.connect)();
         const users = yield conn.query('SELECT * FROM users  WHERE email = ?', [email]);
-        console.log(users[0].length);
+        //console.log(users[0].length);
         if (users[0].length > 0) {
-            if (bcrypt_1.default.compareSync(password, users[0][0].user_password)) {
+            if (bcrypt_1.default.compareSync(user_password, users[0][0].user_password)) {
                 return res.json({ message: "Can't change password, the password is the same" });
             }
             else {
-                if (password === confirm_password) {
-                    yield conn.query('UPDATE users SET user_password = ?, confirm_password = ? WHERE email = ?', [bcrypt_1.default.hashSync(password, 10),
+                if (user_password === confirm_password) {
+                    yield conn.query('UPDATE users SET user_password = ?, confirm_password = ? WHERE email = ?', [bcrypt_1.default.hashSync(user_password, 10),
                         bcrypt_1.default.hashSync(confirm_password, 10), email]);
                     return res.json({ message: "Password changed" });
                 }
