@@ -99,7 +99,7 @@
     "skipLibCheck": true ,                                /* Skip type checking all .d.ts files. */
     "typeRoots": ["./src/types", "./node_modules/@types"] /* Specify the location of the TypeScript standard library. */
   },
-  "include": ["src"],
+  "include": ["src", "lalu_ldap/ldap_auth.ts"],
   "exclude": ["node_modules"],
   "files": ["types.d.ts"]
 }

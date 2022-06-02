@@ -28,6 +28,8 @@
     "express": "^4.17.3",
     "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.1",
+    "ldap-ts-client": "^0.14.3",
+    "ldapjs": "^2.3.2",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3"
