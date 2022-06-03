@@ -30,6 +30,7 @@
     "jsonwebtoken": "^8.5.1",
     "ldap-ts-client": "^0.14.3",
     "ldapjs": "^2.3.2",
+    "ldapts": "^4.0.0",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",

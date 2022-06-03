@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import bcrypt from 'bcrypt'
-import { modifyPassword } from '../../lalu_ldap/ldap_auth';
+import { modifyPassword } from '../lalu_ldap/ldap_auth';
 
 import {connect} from '../database'
 

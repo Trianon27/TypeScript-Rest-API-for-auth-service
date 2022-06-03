@@ -7,7 +7,12 @@ exports.modifyPassword = exports.searchUser = exports.addUser = exports.authenti
 const ldap = require('ldapjs');
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const client = ldap.createClient({
-    url: 'ldap:localhost:8085'
+    url: 'ldap:localhost:8085',
+    reconnect: true,
+    idleTimeout: 259200000,
+    initialDelay: 100,
+    maxDelay: 500,
+    failAfter: 5
 });
 function authenticateDN(name_user, password) {
     /*bind use for authentication*/
@@ -60,75 +65,50 @@ function addUser(user_name, name, email, password) {
     });
 }
 exports.addUser = addUser;
+//Validates the email format
 function validateEmail(email) {
     const regularExpression = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return regularExpression.test(String(email).toLowerCase());
 }
 // create a function to search user
-var flag_l = null;
 function searchUser(username, password) {
-    var opts = {
-        filter: '(objectClass=inetOrgPerson)',
-        scope: 'sub',
-        attributes: ['cn', 'userPassword']
-    };
-    client.search('ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', opts, function (err, res) {
-        if (err) {
-            console.log("Error in search " + err);
-        }
-        else {
-            res.on('searchEntry', function (entry) {
-                //console.log('entry: ' + JSON.stringify(entry.object));
-                if (entry.object.cn == username && bcrypt_1.default.compareSync(password, entry.object.userPassword)) {
-                    console.log("User found");
-                    flag_l = true;
-                }
-                else {
-                    console.log("User doesn't exist in directory");
-                    flag_l = false;
-                }
-            });
-            res.on('end', (result) => {
-                if (flag_l) {
-                    global.flag = true;
-                }
-                else {
-                    global.flag = false;
-                }
-            });
-        }
-    });
-    return global.flag;
-    //let object: any = null
-    /* client.search('ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', opts, (err:any, res:any) => {
-
-      res.on('searchEntry', entry => {
-        object = entry.object
-      })
-
-      res.on('error', err => {
-        console.error('error: ' + err.message)
-        client.destroy()
-        reject(err)
-      })
-      res.on('end', result => {
-        if (!object) {
-          client.destroy()
-          return reject('Invalid user on ldap')
-        }
-        client.bind(object.dn, password, err => {
-          if (err) {
-            client.destroy()
-            console.error('Invalid Login', err)
-            return reject(err)
-          }
-
-          client.destroy()
-
-          return resolve(new User(object.dn, object.sAMAccountName, object.mail))
-        })
-      })
-    }) */
+    return new Promise((resolve, reject) => {
+        var opts = {
+            filter: '(objectClass=inetOrgPerson)',
+            scope: 'sub',
+            attributes: ['cn', 'userPassword']
+        };
+        //Client operation search 
+        var flag_l = null;
+        client.search('ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', opts, function (err, res) {
+            if (err) {
+                console.log("Error in search " + err);
+                return reject(err);
+            }
+            else {
+                res.on('searchEntry', function (entry) {
+                    //console.log('entry: ' + JSON.stringify(entry.object));
+                    if (entry.object.cn == username && bcrypt_1.default.compareSync(password, entry.object.userPassword)) {
+                        flag_l = true;
+                    }
+                    else {
+                        flag_l = false;
+                    }
+                });
+                //define the state of the search to the global function 
+                res.on('end', (result) => {
+                    if (flag_l) {
+                        console.log("User found");
+                        return resolve(true);
+                    }
+                    else {
+                        console.log("User doesn't exist in directory");
+                        return resolve(false);
+                    }
+                });
+            }
+        });
+    }).catch(() => null); // unused rejection handler
 }
 exports.searchUser = searchUser;
 //create a function to modify LDAP password

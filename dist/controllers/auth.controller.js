@@ -16,11 +16,19 @@ exports.showProfile = exports.loginUser = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const database_1 = require("../database");
+const ldap_auth_1 = require("../lalu_ldap/ldap_auth");
 //create a function to login
 function loginUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const loginU = req.body;
-        //console.log(loginU);
+        //LDAP operation
+        let username = loginU.user_name;
+        let password = loginU.user_password;
+        var verification = yield (0, ldap_auth_1.searchUser)(username, password);
+        if (!verification) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        //Normal operation 
         const conn = yield (0, database_1.connect)();
         if (loginU.user_name) {
             //console.log("test0");

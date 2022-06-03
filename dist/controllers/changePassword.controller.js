@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.changePassword = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const ldap_auth_1 = require("../lalu_ldap/ldap_auth");
 const database_1 = require("../database");
 //create a function to change password
 function changePassword(req, res) {
@@ -30,6 +31,8 @@ function changePassword(req, res) {
                 if (user_password === confirm_password) {
                     yield conn.query('UPDATE users SET user_password = ?, confirm_password = ? WHERE email = ?', [bcrypt_1.default.hashSync(user_password, 10),
                         bcrypt_1.default.hashSync(confirm_password, 10), email]);
+                    //modify password on LDAP
+                    (0, ldap_auth_1.modifyPassword)(users[0][0].user_name, bcrypt_1.default.hashSync(user_password, 10));
                     return res.json({ message: "Password changed" });
                 }
                 else {

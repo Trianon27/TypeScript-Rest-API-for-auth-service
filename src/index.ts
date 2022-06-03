@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import {authenticateDN} from '../lalu_ldap/ldap_auth'; 
+import {authenticateDN} from './lalu_ldap/ldap_auth'; 
 dotenv.config();
 
 

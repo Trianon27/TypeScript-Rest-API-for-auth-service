@@ -16,6 +16,7 @@ exports.deleteUser = exports.createUser = exports.getUsers = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const database_1 = require("../database");
+const ldap_auth_1 = require("../lalu_ldap/ldap_auth");
 function getUsers(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const conn = yield (0, database_1.connect)();
@@ -41,6 +42,9 @@ function createUser(req, res) {
                 // Keeping the user and encryption of the password
                 newUser.user_password = bcrypt_1.default.hashSync(newUser.user_password, salt);
                 newUser.confirm_password = bcrypt_1.default.hashSync(newUser.confirm_password, salt);
+                //Create user on LDAP
+                (0, ldap_auth_1.addUser)(newUser.user_name, newUser.first_name, newUser.email, newUser.user_password);
+                //Insert the user in the database
                 yield conn.query('INSERT INTO users SET ?', [newUser]);
                 //creating a token
                 const token = jsonwebtoken_1.default.sign({

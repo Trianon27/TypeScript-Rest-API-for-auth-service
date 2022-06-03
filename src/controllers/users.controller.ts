@@ -4,7 +4,7 @@ import jwt from  'jsonwebtoken';
 
 import {connect} from '../database';
 import { users } from '../interface/users';
-import { addUser } from '../../lalu_ldap/ldap_auth';
+import { addUser } from '../lalu_ldap/ldap_auth';
 
 
 export async function getUsers(req: Request, res: Response): Promise<Response> {

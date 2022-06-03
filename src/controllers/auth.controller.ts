@@ -4,7 +4,7 @@ import jwt from  'jsonwebtoken'
 
 import {connect} from '../database'
 import { login } from '../interface/login';
-import { searchUser } from '../../lalu_ldap/ldap_auth';
+import { searchUser } from '../lalu_ldap/ldap_auth';
 
 
 

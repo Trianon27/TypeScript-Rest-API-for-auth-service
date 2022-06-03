@@ -13,12 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
+const ldap_auth_1 = require("./lalu_ldap/ldap_auth");
 dotenv_1.default.config();
 const app_1 = require("./app");
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = new app_1.App(3000);
         yield app.listen();
+        (0, ldap_auth_1.authenticateDN)("cn=admin,dc=lalu,dc=unal,dc=edu,dc=co", "admin");
     });
 }
 main();
