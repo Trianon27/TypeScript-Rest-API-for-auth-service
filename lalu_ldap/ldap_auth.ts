@@ -8,8 +8,6 @@ const client = ldap.createClient({
 
 export function authenticateDN(name_user: any, password: any) {
 
-
-    
     /*bind use for authentication*/
     client.bind(name_user, password, function (err: any) {
         if (err) {
@@ -17,8 +15,8 @@ export function authenticateDN(name_user: any, password: any) {
         } else {
             /*if connection is success then go for any operation*/
             console.log("Success");
-            searchUser();
-            //addUser();
+            //searchUser();
+            addUser();
             //deleteUser();
             //addUserToGroup('cn=Administrators,ou=groups,ou=system');
             //deleteUserFromGroup('cn=Administrators,ou=groups,ou=system');
@@ -31,11 +29,14 @@ export function authenticateDN(name_user: any, password: any) {
 
 function addUser() {
     var entry = {
-        cn: 'foo',
+        cn: 'hola',
         sn: 'bar',
-        objectclass: 'top'
+        mail: 'hola@mundo.com',
+        userPassword: 'userPassword',
+        objectclass:  'inetOrgPerson',
+
     };
-    client.add('cn=foo12,ou=sa,dc=lalu,dc=unal,dc=edu,dc=co', entry, function (err: any) {
+    client.add('cn=hola,ou=sa,dc=lalu,dc=unal,dc=edu,dc=co', entry, function (err: any) {
         if (err) {
             console.log("err in new user " + err);
         } else {
