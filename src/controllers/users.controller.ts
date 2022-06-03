@@ -1,9 +1,10 @@
 import {Request, Response} from 'express';
-import bcrypt from 'bcrypt'
-import jwt from  'jsonwebtoken'
+import bcrypt from 'bcrypt';
+import jwt from  'jsonwebtoken';
 
-import {connect} from '../database'
+import {connect} from '../database';
 import { users } from '../interface/users';
+import { addUser } from '../../lalu_ldap/ldap_auth';
 
 
 export async function getUsers(req: Request, res: Response): Promise<Response> {
@@ -16,6 +17,7 @@ export async function getUsers(req: Request, res: Response): Promise<Response> {
 export async function createUser(req: Request, res: Response): Promise<Response> {
     
     const newUser: users = req.body;
+
     const conn = await connect();
     const user_email_conf: any = await conn.query('SELECT email FROM users  WHERE email = ?', [newUser.email]);
     const user_name_conf: any = await conn.query('SELECT user_name FROM users  WHERE user_name = ?', [newUser.user_name]);
@@ -31,8 +33,13 @@ export async function createUser(req: Request, res: Response): Promise<Response>
             // Keeping the user and encryption of the password
             newUser.user_password = bcrypt.hashSync(newUser.user_password, salt);
             newUser.confirm_password = bcrypt.hashSync(newUser.confirm_password, salt);
-            await conn.query('INSERT INTO users SET ?', [newUser]);
             
+            //Create user on LDAP
+            addUser(newUser.user_name, newUser.first_name,newUser.email, newUser.user_password);
+           
+            //Insert the user in the database
+            await conn.query('INSERT INTO users SET ?', [newUser]);
+
             //creating a token
             const token: string = jwt.sign({
                 user_ID: newUser.id

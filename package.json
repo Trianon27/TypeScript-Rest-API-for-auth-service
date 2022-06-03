@@ -32,6 +32,7 @@
     "ldapjs": "^2.3.2",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
-    "mysql2": "^2.3.3"
+    "mysql2": "^2.3.3",
+    "simple-ldap-search": "^3.1.2"
   }
 }

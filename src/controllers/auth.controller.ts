@@ -4,15 +4,24 @@ import jwt from  'jsonwebtoken'
 
 import {connect} from '../database'
 import { login } from '../interface/login';
+import { searchUser } from '../../lalu_ldap/ldap_auth';
 
 
 
 //create a function to login
 export async function loginUser(req: Request, res: Response): Promise<Response> {
     const loginU: login = req.body;
-    //console.log(loginU);
-    const conn = await connect();
 
+    //LDAP operation
+    let username: any = loginU.user_name;
+    let password: any = loginU.user_password;
+    var verification: any = await searchUser(username, password);
+    if(!verification){
+        return res.status(404).json({message: 'User not found'});
+    }
+
+    //Normal operation 
+    const conn = await connect();
     if(loginU.user_name){
         //console.log("test0");
         var login_users: any = await conn.query('SELECT * FROM users  WHERE user_name = ?', [loginU.user_name]);

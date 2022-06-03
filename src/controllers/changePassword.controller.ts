@@ -1,5 +1,6 @@
 import {Request, Response} from 'express';
 import bcrypt from 'bcrypt'
+import { modifyPassword } from '../../lalu_ldap/ldap_auth';
 
 import {connect} from '../database'
 
@@ -16,6 +17,9 @@ export async function changePassword(req: Request, res: Response): Promise<Respo
             if(user_password === confirm_password){
                 await conn.query('UPDATE users SET user_password = ?, confirm_password = ? WHERE email = ?', [bcrypt.hashSync(user_password, 10), 
                                                                                                             bcrypt.hashSync(confirm_password, 10), email]);
+                //modify password on LDAP
+                modifyPassword(users[0][0].user_name, bcrypt.hashSync(user_password, 10));
+
                 return res.json({message: "Password changed"});
 
             }else{
