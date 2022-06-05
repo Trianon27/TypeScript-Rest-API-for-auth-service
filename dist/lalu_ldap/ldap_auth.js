@@ -6,12 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.modifyPassword = exports.searchUser = exports.addUser = exports.authenticateDN = void 0;
 const ldap = require('ldapjs');
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const client = ldap.createClient({
-    url: 'ldap:localhost:8085',
+    url: process.env.LDAP_URI,
     reconnect: true,
-    idleTimeout: 259200000,
+    idleTimeout: 300000000000,
     initialDelay: 100,
-    maxDelay: 500,
+    maxDelay: 500000000000000,
     failAfter: 5
 });
 function authenticateDN(name_user, password) {
@@ -34,7 +36,7 @@ function addOu() {
         ou: "laluUsers",
         objectclass: 'organizationalUnit',
     };
-    client.add('ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', entry, function (err) {
+    client.add('ou=laluUsers,dc=lalu,dc=dev', entry, function (err) {
         if (err) {
             console.log("err in new user " + err);
         }
@@ -55,7 +57,7 @@ function addUser(user_name, name, email, password) {
         userPassword: password,
         objectclass: 'inetOrgPerson'
     };
-    client.add('cn=' + user_name + ',ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', entry, function (err) {
+    client.add('cn=' + user_name + ',ou=laluUsers,dc=lalu,dc=dev', entry, function (err) {
         if (err) {
             console.log("err in new user " + err);
         }
@@ -80,7 +82,7 @@ function searchUser(username, password) {
         };
         //Client operation search 
         var flag_l = null;
-        client.search('ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', opts, function (err, res) {
+        client.search('ou=laluUsers,dc=lalu,dc=dev', opts, function (err, res) {
             if (err) {
                 console.log("Error in search " + err);
                 return reject(err);
@@ -119,7 +121,7 @@ function modifyPassword(username, password) {
             userPassword: password
         }
     });
-    client.modify('cn=' + username + ',ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', change, function (err) {
+    client.modify('cn=' + username + ',ou=laluUsers,dc=lalu,dc=dev', change, function (err) {
         if (err) {
             console.log("err in new user " + err);
         }

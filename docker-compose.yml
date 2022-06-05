@@ -1,53 +1,72 @@
+version: "3.6"
+
 services:
-  #mysqldb:
-  #  build: ./dbinit
-  #  container_name: lalu_auth_db_container
-  #  command: --default-authentication-plugin=mysql_native_password
-  #  restart: always
-  #  ports:
-  #    - 3306:3306
-  #  expose:
-  #    - 3306
-  #  environment:
-  #    MYSQL_DATABASE: lalu_auth_db
-  #    MYSQL_USER: lalu_user
-  #    MYSQL_PASSWORD: lalu_password
-  #    MYSQL_ROOT_PASSWORD: lalu_password
-  #    SERVICE_TAGS: prod
-  #    SERVICE_NAME: mysqldb
-  #  volumes:
-  #    #- ./dbinit/init.sql:/docker-entrypoint-initdb.d/0_init.sql
-  #    - lalu_auth_vol:/var/lib/mysql
-  #    
-  #  networks:
-  #    - internalnet
 
+  lalu_ldap:
+        image: osixia/openldap:1.1.8
+        container_name: lalu_ldap
+        environment:
+          COMPOSE_HTTP_TIMEOUT: 200
+          LDAP_LOG_LEVEL: "256"
+          LDAP_ORGANISATION: "lalu"
+          LDAP_DOMAIN: "lalu.dev"
+          LDAP_BASE_DN: ""
+          LDAP_ADMIN_PASSWORD: "admin"
+          LDAP_CONFIG_PASSWORD: "config"
+          LDAP_READONLY_USER: "false"
+          LDAP_BACKEND: "hdb"
+          LDAP_TLS: "true"
+          LDAP_TLS_CRT_FILENAME: "ldap.crt"
+          LDAP_TLS_KEY_FILENAME: "ldap.key"
+          LDAP_TLS_CA_CRT_FILENAME: "ca.crt"
+          LDAP_TLS_ENFORCE: "false"
+          LDAP_TLS_CIPHER_SUITE: "SECURE256:-VERS-SSL3.0"
+          LDAP_TLS_PROTOCOL_MIN: "3.1"
+          LDAP_TLS_VERIFY_CLIENT: "demand"
+          LDAP_REPLICATION: "false"
+          LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+          LDAP_SSL_HELPER_PREFIX: "ldap"
+        tty: true
+        stdin_open: true
+        volumes:
+          - /var/lib/ldap
+          - /etc/ldap/slapd.d
+          - /container/service/slapd/assets/certs/
+        ports:
+          - "389:389"
+          - "636:636"
+        hostname: "lalu.dev"
+  lalu_ldap_php_client:
+        image: osixia/phpldapadmin:latest
+        container_name: lalu_ldap_php_client
+        environment:
+          PHPLDAPADMIN_LDAP_HOSTS: "lalu_ldap"
+          PHPLDAPADMIN_HTTPS: "false"
+        ports:
+          - "8085:80"
+        links:
+          - lalu_ldap
   lalu_auth_ms:
-    container_name: lalu_auth_ms_container
-    build: .
-    image: lalu_auth_ms
-    ports:
-      - 3000:3000
-    expose:
-      - 3000
-    environment:
-      DB_HOST: '34.86.206.95'
-      DB_PORT: 3306
-      DB_USER: 'root'
-      DB_PASSWORD: 'Lalu*eventsPW'
-      DB_DATABASE: lalu_auth_db
-      DB_LIMIT: 10
-      SERVICE_TAGS: prod
-      SERVICE_NAME: lalu_auth_ms
-      SERVER_PORT: 3000
-    #depends_on:
-    #  - mysqldb
-    networks:
-      - internalnet
-
-networks:
-  internalnet:
-    driver: bridge
+        container_name: lalu_auth_ms_container
+        build: .
+        image: lalu_auth_ms
+        ports:
+          - 3000:3000
+        expose:
+          - 3000
+        environment:
+          DB_HOST: '34.86.206.95'
+          DB_PORT: 3306
+          LDAP_URI: 'ldap://lalu_ldap:389'
+          DB_USER: 'root'
+          DB_PASSWORD: 'Lalu*eventsPW'
+          DB_DATABASE: lalu_auth_db
+          DB_LIMIT: 10
+          SERVICE_TAGS: prod
+          SERVICE_NAME: lalu_auth_ms
+          SERVER_PORT: 3000
+        depends_on:
+          - lalu_ldap
   
 volumes:
   lalu_auth_vol:

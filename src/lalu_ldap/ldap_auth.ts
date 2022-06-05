@@ -1,23 +1,20 @@
 const ldap = require('ldapjs');
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
 
 
-
+dotenv.config();
 declare global {
     var flag: boolean;
   }
-
-const client = ldap.createClient({
-    url: 'ldap://localhost:8085',
+  const client = ldap.createClient({
+    url: process.env.LDAP_URI,
     reconnect: true,
-        idleTimeout: 259200000,
+        idleTimeout: 300000000000,
         initialDelay: 100,
-        maxDelay: 500,
+        maxDelay: 500000000000000,
         failAfter: 5
     });
-
-
-
 
 export function authenticateDN(name_user: any, password: any) {
 
@@ -29,7 +26,6 @@ export function authenticateDN(name_user: any, password: any) {
             /*if connection is success then go for any operation*/
             addOu();
             console.log("Success");
-            
         }
     });
 }
@@ -41,7 +37,7 @@ function addOu(){
         objectclass:  'organizationalUnit',
 
     };
-    client.add('ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', entry, function (err: any) {
+    client.add('ou=laluUsers,dc=lalu,dc=dev', entry, function (err: any) {
         if (err) {
             console.log("err in new user " + err);
         } else {
@@ -63,7 +59,7 @@ export function addUser(user_name:string, name:string,  email:string, password:s
         objectclass:  'inetOrgPerson' 
     };
     
-    client.add('cn=' + user_name + ',ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', entry, function (err: any) {
+    client.add('cn=' + user_name + ',ou=laluUsers,dc=lalu,dc=dev', entry, function (err: any) {
         if (err) {
             console.log("err in new user " + err);
         } else {
@@ -91,7 +87,7 @@ export function searchUser(username:string, password:string): any {
     
         //Client operation search 
         var flag_l: any = null ;
-        client.search('ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', opts, function (err: any, res: any) {
+        client.search('ou=laluUsers,dc=lalu,dc=dev', opts, function (err: any, res: any) {
             if (err) {
                 console.log("Error in search " + err)
                 return reject(err);
@@ -134,7 +130,7 @@ export function modifyPassword(username:string, password:string) {
             userPassword: password
         }
       });
-    client.modify('cn=' + username +',ou=laluUsers,dc=lalu,dc=unal,dc=edu,dc=co', change, function (err: any) {
+    client.modify('cn=' + username +',ou=laluUsers,dc=lalu,dc=dev', change, function (err: any) {
         if (err) {
             console.log("err in new user " + err);
         } else {
