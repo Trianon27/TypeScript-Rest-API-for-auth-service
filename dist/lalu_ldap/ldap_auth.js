@@ -11,9 +11,9 @@ dotenv_1.default.config();
 const client = ldap.createClient({
     url: process.env.LDAP_URI,
     reconnect: true,
-    idleTimeout: 300000000000,
+    idleTimeout: 10000,
     initialDelay: 100,
-    maxDelay: 500000000000000,
+    maxDelay: 500,
     failAfter: 5
 });
 function authenticateDN(name_user, password) {
