@@ -2,9 +2,9 @@ version: "3.6"
 
 services:
 
-  lalu_ldap:
+  lalu-ldap:
         image: osixia/openldap:1.1.8
-        container_name: lalu_ldap
+        container_name: lalu-ldap
         environment:
           COMPOSE_HTTP_TIMEOUT: 200
           LDAP_LOG_LEVEL: "256"
@@ -36,16 +36,16 @@ services:
           - "389:389"
           - "636:636"
         hostname: "lalu.dev"
-  lalu_ldap_php_client:
+  lalu-ldap-php-client:
         image: osixia/phpldapadmin:latest
-        container_name: lalu_ldap_php_client
+        container_name: lalu-ldap-php-client
         environment:
-          PHPLDAPADMIN_LDAP_HOSTS: "lalu_ldap"
+          PHPLDAPADMIN_LDAP_HOSTS: "lalu-ldap"
           PHPLDAPADMIN_HTTPS: "false"
         ports:
           - "8085:80"
         links:
-          - lalu_ldap
+          - lalu-ldap
   lalu_auth_ms:
         container_name: lalu_auth_ms_container
         build: .
@@ -57,7 +57,7 @@ services:
         environment:
           DB_HOST: '34.86.206.95'
           DB_PORT: 3306
-          LDAP_URI: 'ldap://lalu_ldap:389'
+          LDAP_URI: 'ldap://lalu-ldap:389'
           DB_USER: 'root'
           DB_PASSWORD: 'Lalu*eventsPW'
           DB_DATABASE: lalu_auth_db
@@ -66,7 +66,7 @@ services:
           SERVICE_NAME: lalu_auth_ms
           SERVER_PORT: 3000
         depends_on:
-          - lalu_ldap
+          - lalu-ldap
   
 volumes:
   lalu_auth_vol:
